@@ -14,19 +14,26 @@ st.set_page_config(page_title="🧠 Personality Predictor", layout="centered")
 st.sidebar.title("🧠 Personality Predictor")
 mode = st.sidebar.radio("Choose Input Mode", ["-- Select --", "Single Entry Form", "CSV File Upload"])
 
+# ---------------- Clear Trigger ----------------
+if "clear_triggered" not in st.session_state:
+    st.session_state.clear_triggered = False
+
+if st.session_state.clear_triggered:
+    st.session_state.update({
+        "time_spent_alone": "",
+        "stage_fear": "Yes",
+        "social_event_attendance": "",
+        "going_outside": "",
+        "drained_after_socializing": "Yes",
+        "friends_circle_size": "",
+        "post_frequency": "",
+        "clear_triggered": False
+    })
+    st.experimental_rerun()
+
 # ---------------- Page Title ----------------
 st.title("✨ Predict Personality Type")
 st.markdown("Use behavioral traits to determine if a person is an **Introvert** or **Extrovert**.")
-
-# ---------------- Helper to Clear Fields ----------------
-def clear_form():
-    st.session_state["time_spent_alone"] = ""
-    st.session_state["stage_fear"] = "Yes"
-    st.session_state["social_event_attendance"] = ""
-    st.session_state["going_outside"] = ""
-    st.session_state["drained_after_socializing"] = "Yes"
-    st.session_state["friends_circle_size"] = ""
-    st.session_state["post_frequency"] = ""
 
 # ---------------- Content Rendering ----------------
 if mode == "Single Entry Form":
@@ -88,30 +95,29 @@ if mode == "Single Entry Form":
     with col1:
         if st.button("🔎 Predict Personality"):
             try:
-                json_payload = {
+                payload = {
                     "Time_spent_Alone": float(st.session_state["time_spent_alone"]),
-                    "Stage_fear": st.session_state["stage_fear"].strip().capitalize(),
+                    "Stage_fear": st.session_state["stage_fear"].capitalize(),
                     "Social_event_attendance": float(st.session_state["social_event_attendance"]),
                     "Going_outside": float(st.session_state["going_outside"]),
-                    "Drained_after_socializing": st.session_state["drained_after_socializing"].strip().capitalize(),
+                    "Drained_after_socializing": st.session_state["drained_after_socializing"].capitalize(),
                     "Friends_circle_size": float(st.session_state["friends_circle_size"]),
                     "Post_frequency": float(st.session_state["post_frequency"])
                 }
-
-                response = requests.post(API_URL_SINGLE, json=json_payload)
+                response = requests.post(API_URL_SINGLE, json=payload)
                 if response.status_code == 200:
-                    result = response.json()
-                    st.success(f"🧠 Predicted Personality: **{result['Personality']}**")
+                    st.success(f"🧠 Predicted Personality: **{response.json()['Personality']}**")
                 else:
                     st.error(f"❌ Error: {response.json().get('detail', 'Unknown error')}")
             except ValueError:
-                st.error("🚫 Please ensure all numeric fields are filled with valid numbers.")
+                st.error("🚫 Ensure all numeric fields are filled correctly.")
             except Exception as e:
                 st.error(f"❗ Request failed: {e}")
 
     with col2:
         if st.button("🧹 Clear Input Fields"):
-            clear_form()
+            st.session_state.clear_triggered = True
+            st.experimental_rerun()
 
 elif mode == "CSV File Upload":
     st.header("📄 CSV File Upload")
