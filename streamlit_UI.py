@@ -23,59 +23,70 @@ if mode == "Single Entry Form":
     st.header("🧍 Single Person Input")
     st.markdown("Enter the behavioral traits below to predict personality type.")
 
-    time_spent_alone = st.number_input(
+    # Inputs as text fields with placeholders
+    time_spent_alone = st.text_input(
         "🕒 Time Spent Alone (hours/day)",
-        help="Average number of hours spent alone per day. (e.g., 5)"
+        placeholder="e.g., 5",
+        help="Average number of hours spent alone per day."
     )
 
-    stage_fear = st.text_input(
-        "🎤 Stage Fear (Yes/No)",
+    stage_fear = st.radio(
+        "🎤 Stage Fear?",
+        options=["Yes", "No"],
         help="Do you fear speaking or performing in public?"
     )
 
-    social_event_attendance = st.number_input(
-        "🎉 Social Event Attendance",
-        help="How frequently do you attend social events? (Numeric scale or event count)"
+    social_event_attendance = st.text_input(
+        "🎉 Social Event Attendance (per day)",
+        placeholder="e.g., 8",
+        help="How often do you attend social events?"
     )
 
-    going_outside = st.number_input(
+    going_outside = st.text_input(
         "🌳 Enjoyment of Going Outside",
-        help="How much do you enjoy spending time outside? (Rate numerically, e.g., 0 to 10)"
+        placeholder="Rate it from 0-10, e.g., 7",
+        help="Rate how much you enjoy spending time outside."
     )
 
-    drained_after_socializing = st.text_input(
-        "😫 Feel Drained After Socializing (Yes/No)",
+    drained_after_socializing = st.radio(
+        "😫 Feel Drained After Socializing?",
+        options=["Yes", "No"],
         help="Do you feel mentally exhausted after socializing?"
     )
 
-    friends_circle_size = st.number_input(
+    friends_circle_size = st.text_input(
         "👥 Size of Friends Circle",
+        placeholder="e.g., 3",
         help="How many close friends do you have?"
     )
 
-    post_frequency = st.number_input(
-        "📱 Social Media Post Frequency (posts/week)",
-        help="How many times do you post on social media in a week?"
+    post_frequency = st.text_input(
+        "📱 Social Media Post Frequency (posts/day)",
+        placeholder="e.g., 2",
+        help="How many times per week do you post on social media?"
     )
 
     if st.button("🔎 Predict Personality"):
-        json_payload = {
-            "Time_spent_Alone": time_spent_alone,
-            "Stage_fear": stage_fear.strip(),
-            "Social_event_attendance": social_event_attendance,
-            "Going_outside": going_outside,
-            "Drained_after_socializing": drained_after_socializing.strip(),
-            "Friends_circle_size": friends_circle_size,
-            "Post_frequency": post_frequency
-        }
-
         try:
+            # Validate and convert numeric fields
+            json_payload = {
+                "Time_spent_Alone": float(time_spent_alone),
+                "Stage_fear": stage_fear.strip().capitalize(),
+                "Social_event_attendance": float(social_event_attendance),
+                "Going_outside": float(going_outside),
+                "Drained_after_socializing": drained_after_socializing.strip().capitalize(),
+                "Friends_circle_size": float(friends_circle_size),
+                "Post_frequency": float(post_frequency)
+            }
+
             response = requests.post(API_URL_SINGLE, json=json_payload)
             if response.status_code == 200:
                 result = response.json()
                 st.success(f"🧠 Predicted Personality: **{result['Personality']}**")
             else:
                 st.error(f"❌ Error: {response.json().get('detail', 'Unknown error')}")
+        except ValueError:
+            st.error("🚫 Please ensure all numeric fields are filled with valid numbers.")
         except Exception as e:
             st.error(f"❗ Request failed: {e}")
 
