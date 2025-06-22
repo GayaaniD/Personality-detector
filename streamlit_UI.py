@@ -5,8 +5,8 @@ import json
 import io
 
 # API endpoints
-API_URL_SINGLE = "http://localhost:8000/predict"
-API_URL_CSV = "http://localhost:8000/predict-csv"
+API_URL_SINGLE = "https://personality-detector.onrender.com/predict"
+API_URL_CSV = "https://personality-detector.onrender.com/predict-csv"
 
 st.set_page_config(page_title="🧠 Personality Predictor", layout="centered")
 
