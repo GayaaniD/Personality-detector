@@ -29,7 +29,7 @@ if st.session_state.clear_triggered:
         "post_frequency": "",
         "clear_triggered": False
     })
-    st.experimental_rerun()
+    st.rerun()
 
 # ---------------- Page Title ----------------
 st.title("✨ Predict Personality Type")
@@ -117,7 +117,7 @@ if mode == "Single Entry Form":
     with col2:
         if st.button("🧹 Clear Input Fields"):
             st.session_state.clear_triggered = True
-            st.experimental_rerun()
+            st.rerun()
 
 elif mode == "CSV File Upload":
     st.header("📄 CSV File Upload")
