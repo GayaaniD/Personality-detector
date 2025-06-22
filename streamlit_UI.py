@@ -12,40 +12,70 @@ st.set_page_config(page_title="🧠 Personality Predictor", layout="centered")
 
 # ---------------- Sidebar ----------------
 st.sidebar.title("🧠 Personality Predictor")
-mode = st.sidebar.radio("Choose Input Mode", ["-- Select --", "Single JSON Input", "CSV File Upload"])
+mode = st.sidebar.radio("Choose Input Mode", ["-- Select --", "Single Entry Form", "CSV File Upload"])
 
 # ---------------- Page Title ----------------
 st.title("✨ Predict Personality Type")
 st.markdown("Use behavioral traits to determine if a person is an **Introvert** or **Extrovert**.")
 
 # ---------------- Content Rendering ----------------
-if mode == "Single JSON Input":
-    st.header("🔍 JSON Input Form")
-    st.markdown("Paste a single person's data below in JSON format.")
+if mode == "Single Entry Form":
+    st.header("🧍 Single Person Input")
+    st.markdown("Enter the behavioral traits below to predict personality type.")
 
-    default_json = {
-        "Time_spent_Alone": 5,
-        "Stage_fear": "No",
-        "Social_event_attendance": 8,
-        "Going_outside": 7,
-        "Drained_after_socializing": "Yes",
-        "Friends_circle_size": 3,
-        "Post_frequency": 2
-    }
+    time_spent_alone = st.number_input(
+        "🕒 Time Spent Alone (hours/day)",
+        help="Average number of hours spent alone per day. (e.g., 5)"
+    )
 
-    input_json = st.text_area("Paste JSON input", value=json.dumps(default_json, indent=2), height=300)
+    stage_fear = st.text_input(
+        "🎤 Stage Fear (Yes/No)",
+        help="Do you fear speaking or performing in public?"
+    )
+
+    social_event_attendance = st.number_input(
+        "🎉 Social Event Attendance",
+        help="How frequently do you attend social events? (Numeric scale or event count)"
+    )
+
+    going_outside = st.number_input(
+        "🌳 Enjoyment of Going Outside",
+        help="How much do you enjoy spending time outside? (Rate numerically, e.g., 0 to 10)"
+    )
+
+    drained_after_socializing = st.text_input(
+        "😫 Feel Drained After Socializing (Yes/No)",
+        help="Do you feel mentally exhausted after socializing?"
+    )
+
+    friends_circle_size = st.number_input(
+        "👥 Size of Friends Circle",
+        help="How many close friends do you have?"
+    )
+
+    post_frequency = st.number_input(
+        "📱 Social Media Post Frequency (posts/week)",
+        help="How many times do you post on social media in a week?"
+    )
 
     if st.button("🔎 Predict Personality"):
+        json_payload = {
+            "Time_spent_Alone": time_spent_alone,
+            "Stage_fear": stage_fear.strip(),
+            "Social_event_attendance": social_event_attendance,
+            "Going_outside": going_outside,
+            "Drained_after_socializing": drained_after_socializing.strip(),
+            "Friends_circle_size": friends_circle_size,
+            "Post_frequency": post_frequency
+        }
+
         try:
-            data = json.loads(input_json)
-            response = requests.post(API_URL_SINGLE, json=data)
+            response = requests.post(API_URL_SINGLE, json=json_payload)
             if response.status_code == 200:
                 result = response.json()
                 st.success(f"🧠 Predicted Personality: **{result['Personality']}**")
             else:
                 st.error(f"❌ Error: {response.json().get('detail', 'Unknown error')}")
-        except json.JSONDecodeError:
-            st.error("🚫 Invalid JSON format. Please correct and try again.")
         except Exception as e:
             st.error(f"❗ Request failed: {e}")
 
