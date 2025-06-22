@@ -18,6 +18,16 @@ mode = st.sidebar.radio("Choose Input Mode", ["-- Select --", "Single Entry Form
 st.title("✨ Predict Personality Type")
 st.markdown("Use behavioral traits to determine if a person is an **Introvert** or **Extrovert**.")
 
+# ---------------- Helper to Clear Fields ----------------
+def clear_form():
+    st.session_state["time_spent_alone"] = ""
+    st.session_state["stage_fear"] = "Yes"
+    st.session_state["social_event_attendance"] = ""
+    st.session_state["going_outside"] = ""
+    st.session_state["drained_after_socializing"] = "Yes"
+    st.session_state["friends_circle_size"] = ""
+    st.session_state["post_frequency"] = ""
+
 # ---------------- Content Rendering ----------------
 if mode == "Single Entry Form":
     st.header("🧍 Single Person Input")
